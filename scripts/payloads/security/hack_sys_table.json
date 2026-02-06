@@ -1,0 +1,5 @@
+{
+    "query": "SELECT * FROM information_schema.tables",
+    "email": "scottlexium@gmail.com",
+    "format": "csv"
+}

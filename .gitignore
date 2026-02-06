@@ -1,0 +1,28 @@
+# Binaries
+server
+server.exe
+cmd/server/server
+cmd/server/server.exe
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Local exports
+exports/
+*.xlsx
+
+# Environment
+.env
+.env.local
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Go
+vendor/
+go.sum

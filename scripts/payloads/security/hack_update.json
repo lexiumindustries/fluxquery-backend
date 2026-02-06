@@ -1,0 +1,5 @@
+{
+    "query": "SELECT * FROM users WHERE id = (UPDATE users SET score=999)",
+    "email": "scottlexium@gmail.com",
+    "format": "csv"
+}

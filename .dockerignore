@@ -1,0 +1,12 @@
+.git
+.gitignore
+.dockerignore
+.env
+exports
+*.exe
+*.md
+docs
+examples
+scripts
+tests
+vendor

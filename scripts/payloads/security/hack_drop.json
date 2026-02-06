@@ -1,0 +1,5 @@
+{
+    "query": "DROP TABLE users",
+    "email": "scottlexium@gmail.com",
+    "format": "csv"
+}
