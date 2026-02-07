@@ -20,9 +20,11 @@ import (
 var version = "dev"
 
 type AgentConfig struct {
-	MySQLDSN   string
-	ReactorURL string
-	AgentKey   string
+	MySQLDSN    string
+	PostgresDSN string
+	MongoURI    string
+	ReactorURL  string
+	AgentKey    string
 }
 
 type JobCommand struct {
@@ -41,7 +43,9 @@ func main() {
 		fmt.Fprintf(os.Stderr, "\nEnvironment Variables (Required):\n")
 		fmt.Fprintf(os.Stderr, "  AGENT_KEY    Your unique agent key (sk_live_...)\n")
 		fmt.Fprintf(os.Stderr, "  REACTOR_URL  WebSocket URL (e.g., wss://api.fluxquery.com)\n")
-		fmt.Fprintf(os.Stderr, "  MYSQL_DSN    Database connection string (user:pass@tcp(host:3306)/db)\n")
+		fmt.Fprintf(os.Stderr, "  MYSQL_DSN    MySQL connection string (user:pass@tcp(host:3306)/db)\n")
+		fmt.Fprintf(os.Stderr, "  POSTGRES_DSN PostgreSQL connection string (postgres://user:pass@host:5432/db?sslmode=disable)\n")
+		fmt.Fprintf(os.Stderr, "  MONGO_URI    MongoDB connection URI (mongodb://host:27017/db)\n")
 		fmt.Fprintf(os.Stderr, "\nExample:\n")
 		fmt.Fprintf(os.Stderr, "  export AGENT_KEY=\"sk_live_123\"\n")
 		fmt.Fprintf(os.Stderr, "  export REACTOR_URL=\"wss://api.fluxquery.com\"\n")
@@ -67,26 +71,44 @@ func main() {
 	slog.SetDefault(logger)
 
 	config := AgentConfig{
-		MySQLDSN:   os.Getenv("MYSQL_DSN"),
-		ReactorURL: os.Getenv("REACTOR_URL"), // e.g., "ws://localhost:8080"
-		AgentKey:   os.Getenv("AGENT_KEY"),
+		MySQLDSN:    os.Getenv("MYSQL_DSN"),
+		PostgresDSN: os.Getenv("POSTGRES_DSN"),
+		MongoURI:    os.Getenv("MONGO_URI"),
+		ReactorURL:  os.Getenv("REACTOR_URL"), // e.g., "ws://localhost:8080"
+		AgentKey:    os.Getenv("AGENT_KEY"),
 	}
 
-	if config.MySQLDSN == "" || config.ReactorURL == "" {
-		slog.Error("Missing configuration (MYSQL_DSN, REACTOR_URL)")
+	if config.ReactorURL == "" {
+		slog.Error("Missing configuration: REACTOR_URL is required")
+		os.Exit(1)
+	}
+
+	if config.MySQLDSN == "" && config.PostgresDSN == "" && config.MongoURI == "" {
+		slog.Error("Missing database configuration: Set MYSQL_DSN, POSTGRES_DSN, or MONGO_URI")
 		os.Exit(1)
 	}
 
 	slog.Info("Starting FluxQuery Agent", "reactor", config.ReactorURL)
 
 	// Initialize Driver
-	dbDriver := driver.NewMySQLDriver(config.MySQLDSN)
+	var dbDriver driver.Driver
+	if config.MongoURI != "" {
+		dbDriver = driver.NewMongoDriver(config.MongoURI)
+		slog.Info("Using MongoDB Driver")
+	} else if config.PostgresDSN != "" {
+		dbDriver = driver.NewPostgresDriver(config.PostgresDSN)
+		slog.Info("Using PostgreSQL Driver")
+	} else {
+		dbDriver = driver.NewMySQLDriver(config.MySQLDSN)
+		slog.Info("Using MySQL Driver")
+	}
+
 	if err := dbDriver.Ping(context.Background()); err != nil {
-		slog.Error("Failed to connect to Local DB", "error", err)
+		slog.Error("Failed to connect to Database", "error", err)
 		os.Exit(1)
 	}
 	defer dbDriver.Close()
-	slog.Info("Connected to Local DB (MySQL)")
+	slog.Info("Connected to Database")
 
 	// Connect to Control Plane
 	controlURL := config.ReactorURL + "/agent/control"
