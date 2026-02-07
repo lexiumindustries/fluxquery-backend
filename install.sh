@@ -55,13 +55,22 @@ else
   exit 1
 fi
 
-chmod +x "$ASSET_NAME"
+# Install to /usr/local/bin (requires sudo if not root)
+INSTALL_DIR="/usr/local/bin"
+TARGET_PATH="${INSTALL_DIR}/${BINARY_NAME}"
+
+echo "Installing to $TARGET_PATH..."
+
+if [ -w "$INSTALL_DIR" ]; then
+    mv "$ASSET_NAME" "$TARGET_PATH"
+else
+    echo "Requires sudo permissions to install to $INSTALL_DIR"
+    sudo mv "$ASSET_NAME" "$TARGET_PATH"
+fi
+
+chmod +x "$TARGET_PATH"
 
 echo ""
-echo "Successfully downloaded $ASSET_NAME"
-echo "Run it with:"
-if [ "$OS" = "windows" ]; then
-    echo "  ./$ASSET_NAME"
-else
-    echo "  ./$ASSET_NAME"
-fi
+echo "Successfully installed FluxQuery Agent!"
+echo "Run it from anywhere:"
+echo "  fluxquery-agent --version"

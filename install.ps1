@@ -12,14 +12,31 @@ Write-Host "FluxQuery Agent Installer (Windows)"
 Write-Host "==================================="
 Write-Host "Downloading latest release from $Repo..."
 
+# Create Install Directory
+$InstallDir = "$env:LOCALAPPDATA\FluxQuery\bin"
+if (-not (Test-Path $InstallDir)) {
+    New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
+}
+
+$OutputPath = Join-Path $InstallDir $Output
+
 try {
-    Invoke-WebRequest -Uri $DownloadUrl -OutFile $Output
+    Invoke-WebRequest -Uri $DownloadUrl -OutFile $OutputPath
 } catch {
-    Write-Error "Failed to download agent. Please check your internet connection or try identifying the specific version."
+    Write-Error "Failed to download agent. Please check your internet connection."
     exit 1
 }
 
+# Add to PATH if not already present
+$UserPath = [Environment]::GetEnvironmentVariable("Path", "User")
+if ($UserPath -notlike "*$InstallDir*") {
+    Write-Host "Adding $InstallDir to User PATH..."
+    [Environment]::SetEnvironmentVariable("Path", "$UserPath;$InstallDir", "User")
+    $env:Path += ";$InstallDir"
+    Write-Host "PATH updated. You may need to restart your terminal."
+}
+
 Write-Host ""
-Write-Host "Successfully downloaded $Output"
-Write-Host "Run it with:"
-Write-Host "  ./$Output"
+Write-Host "Successfully installed to $OutputPath"
+Write-Host "Run it from anywhere:"
+Write-Host "  fluxquery-agent"
