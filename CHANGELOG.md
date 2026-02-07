@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/lexiumindustries/fluxquery-backend/compare/v1.2.0...v1.2.1) (2026-02-07)
+
+
+### Bug Fixes
+
+* **agent:** add --version flag and inject version at build time ([f34a75b](https://github.com/lexiumindustries/fluxquery-backend/commit/f34a75bcf57dcd5c3d96ec007e74b06966d0dec2))
+
 # [1.2.0](https://github.com/lexiumindustries/fluxquery-backend/compare/v1.1.0...v1.2.0) (2026-02-07)
 
 
