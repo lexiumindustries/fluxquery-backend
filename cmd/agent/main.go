@@ -31,6 +31,24 @@ type JobCommand struct {
 }
 
 func main() {
+	// Custom Usage/Help Message
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "FluxQuery Agent %s\n\n", version)
+		fmt.Fprintf(os.Stderr, "Usage:\n")
+		fmt.Fprintf(os.Stderr, "  fluxquery-agent [flags]\n\n")
+		fmt.Fprintf(os.Stderr, "Flags:\n")
+		flag.PrintDefaults()
+		fmt.Fprintf(os.Stderr, "\nEnvironment Variables (Required):\n")
+		fmt.Fprintf(os.Stderr, "  AGENT_KEY    Your unique agent key (sk_live_...)\n")
+		fmt.Fprintf(os.Stderr, "  REACTOR_URL  WebSocket URL (e.g., wss://api.fluxquery.com)\n")
+		fmt.Fprintf(os.Stderr, "  MYSQL_DSN    Database connection string (user:pass@tcp(host:3306)/db)\n")
+		fmt.Fprintf(os.Stderr, "\nExample:\n")
+		fmt.Fprintf(os.Stderr, "  export AGENT_KEY=\"sk_live_123\"\n")
+		fmt.Fprintf(os.Stderr, "  export REACTOR_URL=\"wss://api.fluxquery.com\"\n")
+		fmt.Fprintf(os.Stderr, "  export MYSQL_DSN=\"user:pass@tcp(localhost:3306)/db\"\n")
+		fmt.Fprintf(os.Stderr, "  fluxquery-agent\n")
+	}
+
 	showVersion := flag.Bool("version", false, "Show version")
 	flag.Parse()
 
