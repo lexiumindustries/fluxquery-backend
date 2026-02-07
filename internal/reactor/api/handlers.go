@@ -12,6 +12,7 @@ import (
 	"mysql-exporter/internal/reactor/hub"
 	"mysql-exporter/internal/reactor/store"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/websocket"
 )
 
@@ -24,14 +25,16 @@ var upgrader = websocket.Upgrader{
 }
 
 type Handler struct {
-	Store *store.Store
-	Hub   *hub.Hub
+	Store     *store.Store
+	Hub       *hub.Hub
+	APISecret string
 }
 
-func NewHandler(s *store.Store, h *hub.Hub) *Handler {
+func NewHandler(s *store.Store, h *hub.Hub, secret string) *Handler {
 	return &Handler{
-		Store: s,
-		Hub:   h,
+		Store:     s,
+		Hub:       h,
+		APISecret: secret,
 	}
 }
 
@@ -82,7 +85,24 @@ func (h *Handler) HandleVerify(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(user)
+	// Generate JWT
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub": user.ID,
+		"exp": time.Now().Add(time.Hour * 24).Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte(h.APISecret))
+	if err != nil {
+		slog.Error("Failed to sign token", "error", err)
+		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"id":          user.ID,
+		"email":       user.Email,
+		"accessToken": tokenString,
+	})
 }
 
 // --- API Key Handlers ---
@@ -150,6 +170,32 @@ func (h *Handler) HandleListKeys(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(keys)
+}
+
+type RevokeKeyRequest struct {
+	KeyID int `json:"key_id"`
+}
+
+func (h *Handler) HandleRevokeKey(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req RevokeKeyRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.Store.RevokeAPIKey(req.KeyID); err != nil {
+		slog.Error("Revoke key failed", "error", err)
+		http.Error(w, "Failed to revoke key", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Key revoked"})
 }
 
 // --- Dashboard Handler ---

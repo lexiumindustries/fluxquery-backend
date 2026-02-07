@@ -190,3 +190,8 @@ func (s *Store) ListAPIKeys(userID int) ([]APIKey, error) {
 	}
 	return keys, nil
 }
+
+func (s *Store) RevokeAPIKey(keyID int) error {
+	_, err := s.db.Exec("DELETE FROM api_keys WHERE id = ?", keyID)
+	return err
+}

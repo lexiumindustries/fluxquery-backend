@@ -47,7 +47,7 @@ func main() {
 	h := hub.NewHub()
 
 	// 4. Initialize Handlers
-	handler := api.NewHandler(st, h)
+	handler := api.NewHandler(st, h, cfg.APISecret)
 
 	// 5. Setup Routes & Middleware
 	mux := http.NewServeMux()
@@ -56,8 +56,12 @@ func main() {
 	mux.HandleFunc("/dashboard/stream", handler.HandleDashboard)
 	mux.HandleFunc("/auth/register", handler.HandleRegister)
 	mux.HandleFunc("/auth/verify", handler.HandleVerify)
-	mux.HandleFunc("/auth/keys/create", handler.HandleCreateKey)
-	mux.HandleFunc("/auth/keys/list", handler.HandleListKeys) // New Endpoint
+
+	// Protected Routes
+	authMiddleware := middleware.Auth(cfg.APISecret)
+	mux.Handle("/auth/keys/create", authMiddleware(http.HandlerFunc(handler.HandleCreateKey)))
+	mux.Handle("/auth/keys/list", authMiddleware(http.HandlerFunc(handler.HandleListKeys)))
+	mux.Handle("/auth/keys/revoke", authMiddleware(http.HandlerFunc(handler.HandleRevokeKey)))
 
 	// Wrap with Middleware
 	finalHandler := middleware.CORS(cfg.AllowedOrigins, cfg.AppEnv)(mux)
