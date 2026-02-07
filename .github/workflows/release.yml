@@ -38,6 +38,7 @@ jobs:
 
       - name: Build Agent Binaries
         run: |
+          go mod download
           chmod +x scripts/release_agent.sh
           ./scripts/release_agent.sh
 
