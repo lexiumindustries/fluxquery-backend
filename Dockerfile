@@ -12,7 +12,7 @@ RUN go mod download
 COPY . .
 
 # Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -o /export-service ./cmd/server
+RUN CGO_ENABLED=0 GOOS=linux go build -o /fluxquery-reactor ./cmd/reactor
 
 # Final stage
 FROM alpine:latest
@@ -22,7 +22,7 @@ RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 
 # Copy the binary from the builder stage
-COPY --from=builder /export-service .
+COPY --from=builder /fluxquery-reactor .
 # Copy .env.example as a template if .env is missing (though prod should use env vars)
 COPY .env.example .env
 
@@ -30,4 +30,4 @@ COPY .env.example .env
 EXPOSE 8080
 
 # Run the binary
-CMD ["./export-service"]
+CMD ["./fluxquery-reactor"]

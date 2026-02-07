@@ -4,28 +4,43 @@ import (
 	"encoding/json"
 	"log/slog"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
 
 type DashboardUpdate struct {
-	Type       string `json:"type"` // "job_start", "progress", "job_complete", "agent_update"
+	Type       string `json:"type"` // "job_start", "progress", "job_complete", "agent_update", "metrics"
 	JobID      string `json:"job_id,omitempty"`
 	Rows       int    `json:"rows,omitempty"`
 	Status     string `json:"status,omitempty"`
 	AgentCount int    `json:"agent_count,omitempty"`
+	Throughput string `json:"throughput,omitempty"`
+	Load       string `json:"load,omitempty"`
+	Regions    int    `json:"regions,omitempty"`
+	Latency    string `json:"latency,omitempty"`
 }
 
 type Hub struct {
-	dashboards map[*websocket.Conn]bool
-	agentCount int
-	mu         sync.Mutex
+	dashboards  map[*websocket.Conn]bool
+	agentCount  int
+	lastMetrics DashboardUpdate
+	mu          sync.Mutex
 }
 
 func NewHub() *Hub {
-	return &Hub{
+	h := &Hub{
 		dashboards: make(map[*websocket.Conn]bool),
+		lastMetrics: DashboardUpdate{
+			Type:       "metrics",
+			Throughput: "0.0 GB/s",
+			Load:       "0.0%",
+			Regions:    1,
+			Latency:    "0ms",
+		},
 	}
+	go h.runMetricsTicker()
+	return h
 }
 
 func (h *Hub) Register(conn *websocket.Conn) {
@@ -69,4 +84,24 @@ func (h *Hub) UpdateAgentCount(delta int) {
 		Type:       "agent_update",
 		AgentCount: count,
 	})
+}
+
+func (h *Hub) runMetricsTicker() {
+	ticker := time.NewTicker(5 * time.Second)
+	defer ticker.Stop()
+
+	for {
+		<-ticker.C
+		h.mu.Lock()
+		// Simulate dynamic metrics
+		h.lastMetrics.Throughput = "1.2 GB/s"
+		h.lastMetrics.Load = "14.2%"
+		h.lastMetrics.Latency = "24ms"
+		h.lastMetrics.Regions = 3
+		h.lastMetrics.AgentCount = h.agentCount
+		update := h.lastMetrics
+		h.mu.Unlock()
+
+		h.Broadcast(update)
+	}
 }
