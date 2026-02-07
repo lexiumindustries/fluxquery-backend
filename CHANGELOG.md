@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/lexiumindustries/fluxquery-backend/compare/v1.0.0...v1.1.0) (2026-02-07)
+
+
+### Features
+
+* add one-line install script ([f413da2](https://github.com/lexiumindustries/fluxquery-backend/commit/f413da2ce7c8ce223868b33a9ea9fa936968d3ba))
+
 # 1.0.0 (2026-02-07)
 
 
