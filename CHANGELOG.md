@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/lexiumindustries/fluxquery-backend/compare/v1.1.0...v1.2.0) (2026-02-07)
+
+
+### Features
+
+* add windows install script ([942b376](https://github.com/lexiumindustries/fluxquery-backend/commit/942b3762480a80105bd91020629c753318ee2dcf))
+
 # [1.1.0](https://github.com/lexiumindustries/fluxquery-backend/compare/v1.0.0...v1.1.0) (2026-02-07)
 
 
