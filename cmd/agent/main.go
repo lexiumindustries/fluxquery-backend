@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/gob"
 	"encoding/json"
+	"flag"
+	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -14,6 +16,8 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/joho/godotenv"
 )
+
+var version = "dev"
 
 type AgentConfig struct {
 	MySQLDSN   string
@@ -27,6 +31,14 @@ type JobCommand struct {
 }
 
 func main() {
+	showVersion := flag.Bool("version", false, "Show version")
+	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("FluxQuery Agent %s\n", version)
+		os.Exit(0)
+	}
+
 	gob.Register([]interface{}{})
 	gob.Register(map[string]interface{}{})
 	gob.Register([]byte{})

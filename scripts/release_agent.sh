@@ -16,18 +16,18 @@ echo "Building FluxQuery Agent $VERSION..."
 
 # Windows (x64)
 echo "Compiling for Windows (x64)..."
-GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o $BUILD_DIR/${BIN_NAME}-windows-amd64.exe $CMD_PATH
+GOOS=windows GOARCH=amd64 go build -ldflags="-s -w -X main.version=$VERSION" -o $BUILD_DIR/${BIN_NAME}-windows-amd64.exe $CMD_PATH
 
 # Linux (x64)
 echo "Compiling for Linux (x64)..."
-GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o $BUILD_DIR/${BIN_NAME}-linux-amd64 $CMD_PATH
+GOOS=linux GOARCH=amd64 go build -ldflags="-s -w -X main.version=$VERSION" -o $BUILD_DIR/${BIN_NAME}-linux-amd64 $CMD_PATH
 
 # macOS (Apple Silicon)
 echo "Compiling for macOS (ARM64)..."
-GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o $BUILD_DIR/${BIN_NAME}-darwin-arm64 $CMD_PATH
+GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X main.version=$VERSION" -o $BUILD_DIR/${BIN_NAME}-darwin-arm64 $CMD_PATH
 
 # macOS (Intel)
 echo "Compiling for macOS (x64)..."
-GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o $BUILD_DIR/${BIN_NAME}-darwin-amd64 $CMD_PATH
+GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w -X main.version=$VERSION" -o $BUILD_DIR/${BIN_NAME}-darwin-amd64 $CMD_PATH
 
 echo "Release complete. Binaries located in $BUILD_DIR"
