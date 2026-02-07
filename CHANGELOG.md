@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/lexiumindustries/fluxquery-backend/compare/v1.3.0...v1.3.1) (2026-02-07)
+
+
+### Bug Fixes
+
+* **agent:** add custom help message ([3f159c0](https://github.com/lexiumindustries/fluxquery-backend/commit/3f159c0beff1e2d175548200ec96de6839ceefc0))
+
 # [1.3.0](https://github.com/lexiumindustries/fluxquery-backend/compare/v1.2.1...v1.3.0) (2026-02-07)
 
 
