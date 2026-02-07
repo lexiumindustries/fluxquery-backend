@@ -1,3 +1,15 @@
+# [1.4.0](https://github.com/lexiumindustries/fluxquery-backend/compare/v1.3.1...v1.4.0) (2026-02-07)
+
+
+### Bug Fixes
+
+* **agent:** add missing postgres driver file ([cccad98](https://github.com/lexiumindustries/fluxquery-backend/commit/cccad989e3a2fb3261ef28dc89f3439a747d9dbf))
+
+
+### Features
+
+* **agent:** add mongodb support ([77f6583](https://github.com/lexiumindustries/fluxquery-backend/commit/77f6583100343bfc303e34faacdf9576ca020f00))
+
 ## [1.3.1](https://github.com/lexiumindustries/fluxquery-backend/compare/v1.3.0...v1.3.1) (2026-02-07)
 
 
